@@ -8,8 +8,8 @@ import type { StaticImageData } from "next/image";
 // height and the blurred loading placeholder are read from the file at build
 // time, so any aspect ratio works — though the hints below give the best fit.
 //
-// Note: files in /public are served without the event PIN (the proxy skips
-// static images), so only put photos here you're happy to be public.
+// Note: the whole site is open with no guest PIN, so only put photos here
+// you're happy to be public.
 // ---------------------------------------------------------------------------
 import hero from "../../public/photos/hero.jpg"; //            portrait (vertical) — home hero
 import portrait1 from "../../public/photos/portrait-1.jpg"; // any — couple portrait
@@ -82,7 +82,7 @@ export const MARQUEE_BOTTOM: Photo[] = [
   PHOTOS.moment4,
 ];
 
-/** Background collage behind the PIN screen. */
+/** Background collage behind the admin PIN screen. */
 export const GATE_COLLAGE: Photo[] = [
   PHOTOS.portrait2,
   PHOTOS.detail2,

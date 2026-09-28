@@ -1,9 +1,10 @@
 # Wedding Memory Wall
 
 A private, single-event site for your sister's wedding: guests scan a QR
-code, enter a shared event code, and upload photos, videos and voice notes
-straight from their phones. Everything appears instantly on a live gallery
-wall — great to project on a screen at the reception.
+code and upload photos, videos and voice notes straight from their phones —
+no PIN, straight to the homepage. Everything appears instantly on a live
+gallery wall — great to project on a screen at the reception. The couple's
+`/admin` dashboard stays behind a separate admin code.
 
 Not a multi-tenant SaaS like Eventoly — this is wired for exactly one event,
 which keeps it simple, cheap and fast.
@@ -20,8 +21,8 @@ which keeps it simple, cheap and fast.
 | Animation/UI | Framer Motion, Lucide icons | Smooth, accessible, no emoji-as-icon shortcuts |
 
 **Why this scales for ~100 guests on one day:** the only thing your Next.js
-server does per upload is (1) check the PIN cookie and (2) mint a signed
-upload URL / write one database row — both sub-100ms operations. The actual
+server does per upload is mint a signed upload URL / write one database
+row — a sub-100ms operation. The actual
 photo/video bytes go straight from the guest's phone to Supabase's storage
 CDN. Photos are also compressed in the browser before upload (down to
 ~1.5MB, max 2400px) so you're not waiting on cellular/venue-wifi uploads of
@@ -58,14 +59,14 @@ Copy the example file and fill in real values:
 cp .env.example .env.local
 ```
 
-- `GATE_SECRET` — any long random string. Generate one with:
+- `GATE_SECRET` — any long random string, used to sign the admin session.
+  Generate one with:
   ```bash
   openssl rand -hex 32
   ```
-- `EVENT_PIN` — the code you'll print on invitations/table cards, e.g.
-  `NIMA-SAM-2026`. Keep it easy to type on a phone keyboard (avoid symbols).
 - `ADMIN_PIN` — a separate, private code only you and your sister use to
-  reach `/admin` (view stats, download everything).
+  reach `/admin` (view stats, download everything). Everything else
+  (homepage, `/upload`, `/wall`) is open to anyone with the link — no PIN.
 - `NEXT_PUBLIC_COUPLE_NAMES`, `NEXT_PUBLIC_EVENT_DATE`,
   `NEXT_PUBLIC_VENUE`, `NEXT_PUBLIC_HASHTAG` — shown on the homepage and
   countdown.
@@ -77,9 +78,9 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — you'll land on the
-PIN screen. Enter your `EVENT_PIN` to get in, then try `/upload` (allow
-camera/microphone permissions) and watch items appear on `/wall`.
+Open [http://localhost:3000](http://localhost:3000) — you'll land straight
+on the homepage. Try `/upload` (allow camera/microphone permissions) and
+watch items appear on `/wall`.
 
 ## 5. Deploy to Vercel
 
@@ -115,8 +116,8 @@ previews are picked up automatically.
 | `venue-1..4.jpg`, `sign.jpg` | Marquee, wall banner (`venue-2`), "Save the date" card | Landscape |
 
 Captions and alt text live in [`src/lib/photos.ts`](src/lib/photos.ts) — edit
-them there. Note that anything in `public/` is reachable without the event
-PIN, so only put photos there you're happy to be public.
+them there. Note that the whole site is open with no PIN, so only put
+photos anywhere in the project you're happy to be public.
 
 The design system (colours, fonts, motion rules) is documented in
 [`design-system/wedding-memory-wall/MASTER.md`](design-system/wedding-memory-wall/MASTER.md).
@@ -126,14 +127,16 @@ The design system (colours, fonts, motion rules) is documented in
 - On the homepage, the **Share a memory** / **View the wall** buttons are
   the two links guests need. Put the deployed URL behind a QR code (any
   free QR generator, e.g. [qr-code-generator.com](https://www.qr-code-generator.com/))
-  printed on table cards, next to the event PIN.
-- Consider a short link (e.g. via a free Bitly/is.gd link) so it's easy to
-  read off a card: `your-short-link.com` + code `NIMA-SAM-2026`.
+  printed on table cards — no code to type, guests just scan and go.
+- Consider a short link too (e.g. via a free Bitly/is.gd link) so it's
+  easy to read off a card for anyone typing it manually:
+  `your-short-link.com`.
 
 ## 7. Before the big day — a quick checklist
 
-- [ ] Walk through the whole flow yourself on a phone: enter PIN → upload a
-      photo → record a 10s video → record a voice note → check `/wall`.
+- [ ] Walk through the whole flow yourself on a phone: open the link →
+      upload a photo → record a 10s video → record a voice note → check
+      `/wall`.
 - [ ] Confirm the venue's guest wifi (or guests' own mobile data) can
       handle uploads — ask 2-3 family members to test from the venue if
       possible.
@@ -157,17 +160,24 @@ button.
 - **File size caps** (edit in [`src/lib/event-config.ts`](src/lib/event-config.ts)):
   25MB/photo, 300MB/video, 20MB/voice note. Raise these if needed, but
   bigger videos take longer to upload on venue wifi.
+- **The whole guest-facing site is open — no PIN.** The homepage, `/upload`
+  and `/wall` are reachable by anyone with the URL, and the `/upload` API
+  itself has no auth check, so anyone who finds the link can post to your
+  wall, not just view it. This trades away the earlier "keep it to people
+  with the invite code" protection for a simpler guest experience; the
+  real protection now is that the URL isn't published anywhere public
+  (share it only via the QR code / table cards). Only `/admin` still
+  requires a code.
 - **The storage bucket is public-read.** Anyone with a direct file URL
-  (a random UUID-based path) could view that one file without the PIN.
-  The *site* itself is still PIN-gated, and paths aren't guessable or
-  listed anywhere public — a reasonable tradeoff for a private one-day
-  event in exchange for fast, CDN-served images with no signing overhead.
-  If you want stricter privacy, make the bucket private and switch
-  `getMediaUrl` to mint signed read URLs instead (ask if you want this
-  wired up).
-- **The PIN rate-limiter is in-memory**, so it resets whenever a
-  serverless instance recycles. Fine for deterring casual guessing at
-  ~100 guests; not a substitute for a strong, hard-to-guess `EVENT_PIN`.
+  (a random UUID-based path) can view that one file — expected now that
+  the site itself is unauthenticated too. Paths aren't guessable or
+  listed anywhere public. If you want stricter privacy, make the bucket
+  private and switch `getMediaUrl` to mint signed read URLs instead (ask
+  if you want this wired up).
+- **The admin rate-limiter is in-memory**, so it resets whenever a
+  serverless instance recycles. Fine for deterring casual guessing at the
+  admin code; there's no longer a guest-side rate limiter since there's no
+  guest PIN to guess.
 - **Voice recording (MediaRecorder)** works in all modern mobile browsers,
   but Safari on older iOS versions can be inconsistent — the recorder
   degrades to showing a "microphone blocked" message rather than crashing

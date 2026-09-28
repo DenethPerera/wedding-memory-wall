@@ -1,9 +1,8 @@
-// Lightweight signed-cookie "gate" for a private, single-event site.
-// No user accounts: everyone who knows the shared PIN gets the same signed
-// token. Verification uses Web Crypto so it works in both the Edge proxy
-// runtime and Node route handlers.
+// Lightweight signed-cookie gate for the couple's admin dashboard. No user
+// accounts: whoever knows the admin code gets the same signed token.
+// Verification uses Web Crypto so it works in both the Edge proxy runtime
+// and Node route handlers.
 
-export const GUEST_COOKIE = "wmw_gate";
 export const ADMIN_COOKIE = "wmw_admin_gate";
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days, covers the whole wedding week
 
@@ -38,7 +37,7 @@ function timingSafeEqual(a: string, b: string): boolean {
   return mismatch === 0;
 }
 
-export async function createGateToken(role: "guest" | "admin", secret: string) {
+export async function createGateToken(role: "admin", secret: string) {
   const expires = Date.now() + TOKEN_TTL_MS;
   const payload = `${role}.${expires}`;
   const sig = await hmac(secret, payload);
@@ -47,7 +46,7 @@ export async function createGateToken(role: "guest" | "admin", secret: string) {
 
 export async function verifyGateToken(
   token: string | undefined,
-  role: "guest" | "admin",
+  role: "admin",
   secret: string,
 ): Promise<boolean> {
   if (!token) return false;

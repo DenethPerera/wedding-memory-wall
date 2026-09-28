@@ -1,26 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { cookies } from "next/headers";
-import { GUEST_COOKIE, verifyGateToken } from "@/lib/gate";
 import { createServiceSupabaseClient } from "@/lib/supabase/server";
 
 const MEDIA_TYPES = ["photo", "video", "voice"] as const;
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.GATE_SECRET;
-  if (!secret) {
-    return NextResponse.json({ error: "Server misconfigured." }, { status: 500 });
-  }
-  const cookieStore = await cookies();
-  const valid = await verifyGateToken(
-    cookieStore.get(GUEST_COOKIE)?.value,
-    "guest",
-    secret,
-  );
-  if (!valid) {
-    return NextResponse.json({ error: "Not authorized." }, { status: 401 });
-  }
-
   const body = await request.json().catch(() => null);
   const path = typeof body?.path === "string" ? body.path : "";
   const mediaType = body?.mediaType as (typeof MEDIA_TYPES)[number] | undefined;

@@ -19,11 +19,11 @@ create table if not exists public.uploads (
 create index if not exists uploads_created_at_idx on public.uploads (created_at desc);
 create index if not exists uploads_media_type_idx on public.uploads (media_type);
 
--- 2. Row Level Security: readable by anyone holding the anon key (the app
---    itself is gated by the PIN screen before a visitor ever reaches a page
---    that queries this table), but only the service role can insert /
---    update / delete. This also lets Supabase Realtime broadcast INSERTs to
---    every guest's browser on the /wall page.
+-- 2. Row Level Security: readable by anyone holding the anon key (the
+--    guest-facing app has no PIN, so /wall is open to anyone with the
+--    link), but only the service role can insert / update / delete. This
+--    also lets Supabase Realtime broadcast INSERTs to every guest's
+--    browser on the /wall page.
 alter table public.uploads enable row level security;
 
 drop policy if exists "Public can read uploads" on public.uploads;
@@ -43,8 +43,9 @@ alter publication supabase_realtime add table public.uploads;
 -- 4. Storage bucket for the actual photo/video/audio files.
 -- Public-read (fast, CDN-served, no signing needed to *view* media) but
 -- writes only happen via short-lived signed upload URLs issued by our own
--- server after checking the PIN cookie -- guests never get a key that lets
--- them write directly.
+-- server -- guests never get a key that lets them write directly to
+-- storage, though the /api/uploads/sign endpoint that issues those URLs
+-- is itself unauthenticated (see README: "Notes on limits and tradeoffs").
 insert into storage.buckets (id, name, public)
 values ('wedding-media', 'wedding-media', true)
 on conflict (id) do update set public = true;
@@ -57,4 +58,4 @@ create policy "Public can read wedding media"
 
 -- No insert/update/delete storage policy is created for anon/authenticated.
 -- Uploads only succeed through a signed upload URL minted by the service
--- role from app/api/uploads/sign, which itself requires the PIN cookie.
+-- role from app/api/uploads/sign.
