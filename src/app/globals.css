@@ -1,0 +1,316 @@
+@import "tailwindcss";
+
+/* Matches the wedding invite (wedding-invite-azure-mu.vercel.app) — see design-system/wedding-memory-wall/MASTER.md.
+   Light only, like the invite: no dark-mode palette. */
+:root {
+  --background: #fdecef;
+  --foreground: #1f2933;
+  --card: #fcf9f5;
+  --card-foreground: #1f2933;
+  --primary: #c8a96a;
+  --primary-foreground: #ffffff;
+  --secondary: #a38042;
+  --secondary-foreground: #ffffff;
+  --accent: #c8a96a;
+  --accent-foreground: #1f2933;
+  --gold-ink: #a38042;
+  --coral: #e8a598;
+  --peach: #faf4ec;
+  --lavender: #fdf0f2;
+  --muted: #fdf0f2;
+  --muted-foreground: #5f636b;
+  --border: #edd8c7;
+  --ring: #a38042;
+  --danger: #b42318;
+  --success: #0f7a55;
+  --brand-gradient: linear-gradient(90deg, #d9b87b 0%, #c8a96a 50%, #a38042 100%);
+  --scrim: #1f2933;
+  --glass: rgba(253, 236, 239, 0.7);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold-ink: var(--gold-ink);
+  --color-coral: var(--coral);
+  --color-peach: var(--peach);
+  --color-lavender: var(--lavender);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-scrim: var(--scrim);
+  --font-display: var(--font-cormorant);
+  --font-script: var(--font-great-vibes);
+  --font-sans: var(--font-jost);
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-ken-burns: ken-burns 20s ease-in-out infinite alternate;
+  --animate-aurora: aurora 14s ease-in-out infinite alternate;
+  --animate-heartbeat: heartbeat 1.6s ease-in-out infinite;
+  --animate-bounce-soft: bounce-soft 2s ease-in-out infinite;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  touch-action: manipulation;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 0.75rem;
+}
+
+/* ---------- Brand surfaces ---------- */
+
+.bg-brand {
+  background: var(--brand-gradient);
+}
+
+.text-brand {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--card) 60%, transparent);
+}
+
+.glass-dark {
+  background: rgb(255 255 255 / 0.14);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid rgb(255 255 255 / 0.28);
+}
+
+.shadow-glow {
+  box-shadow:
+    0 10px 30px -8px color-mix(in srgb, var(--primary) 55%, transparent),
+    0 4px 12px -4px color-mix(in srgb, var(--secondary) 40%, transparent);
+}
+
+.shadow-soft {
+  box-shadow: 0 20px 50px -18px rgba(180, 140, 80, 0.22);
+}
+
+/* Gradient border used on the upload dropzone */
+.border-gradient {
+  border: 2px dashed transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    var(--brand-gradient) border-box;
+}
+
+.ampersand {
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* Bottom padding so content clears the mobile tab bar */
+.pb-tabbar {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .pb-tabbar {
+    padding-bottom: 3rem;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bg-shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--muted) 8%,
+    color-mix(in srgb, var(--primary) 18%, var(--muted)) 18%,
+    var(--muted) 33%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-1.5%, -2%, 0);
+  }
+}
+
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(6%, -4%, 0) scale(1.12) rotate(8deg);
+  }
+  100% {
+    transform: translate3d(-5%, 5%, 0) scale(0.95) rotate(-6deg);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  50% {
+    transform: translate3d(var(--petal-drift, 20px), -55vh, 0) rotate(160deg);
+  }
+  90% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  100% {
+    transform: translate3d(calc(var(--petal-drift, 20px) * -0.5), -110vh, 0) rotate(320deg);
+    opacity: 0;
+  }
+}
+
+.petal {
+  animation: float-up var(--petal-duration, 12s) linear var(--petal-delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.18);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  animation: marquee var(--marquee-duration, 45s) linear infinite;
+}
+.marquee-track[data-reverse="true"] {
+  animation-direction: reverse;
+}
+.marquee[data-paused="true"] .marquee-track,
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.live-ping {
+  animation: live-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .petal {
+    display: none;
+  }
+}
