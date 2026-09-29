@@ -291,7 +291,7 @@ export default function HomePage() {
                     <dd>{EVENT.venue}</dd>
                   </div>
                 )} */}
-                {EVENT.hashtag && (
+                {/* {EVENT.hashtag && (
                   <div className="flex items-center gap-3">
                     <dt className="glass flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gold-ink">
                       <Hash size={18} aria-hidden="true" />
@@ -299,7 +299,7 @@ export default function HomePage() {
                     </dt>
                     <dd>Tag your own posts with {EVENT.hashtag}</dd>
                   </div>
-                )}
+                )} */}
               </dl>
               <Link
                 href="/upload"
